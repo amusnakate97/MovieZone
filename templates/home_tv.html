@@ -1,0 +1,1260 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tv-Series Success Prediction</title>
+
+
+    <!-- BootStrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+
+    <!-- css -->
+    <link rel="stylesheet" href="static/css/styles.css">
+
+
+</head>
+
+<body>
+
+    <!-- As a heading -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Tv-Series Success Prediction</a>
+            </div>
+        </div>
+    </nav>
+
+    <br><br><br>
+
+
+    <div class="container">
+
+
+
+        <form action="\predict_tv_series" method="post">
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- Source -->
+                            <h5 class="card-title">Details</h5>
+                            <p>Runtime of Episodes</p>
+                            <input type="number" id="runtime" name="runtime">
+
+                            <p>Lead Actor/Actress</p>
+                            <div class="autocomplete" style="width:300px;">
+                           <input id="myInput" type="text" name="actor" placeholder="name">
+                              </div>
+
+
+                            <p>Number of Votes:</p>
+                            <input type="number" id="votes" name="votes">
+
+                            <p>Start Year</p>
+                            <input type="number" id="start" name="start">
+
+                            <p>End Year:</p>
+                            <input type="number" id="end" name="end">
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Genre</h5>
+                            <!-- Destination -->
+                            <select name="Genre" id="genre" required="required">
+                                <option value="Comedy">Comedy</option>
+                                <option value="Drama">Drama</option>
+                                <option value="Animation">Animation</option>
+                                <option value="Action">Action</option>
+                                <option value="Crime">Crime</option>
+                                <option value="Adventure">Adventure</option>
+                                <option value="Documentary">Documentary</option>
+                                <option value="Biography">Biography</option>
+                                <option value="Game-Show">Game-Show</option>
+                                <option value="Reality-TV">Reality-TV</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                           <h5 class="card-title">Certificate</h5>
+                            <!-- Destination -->
+                            <select name="certificate" id="certificate" required="required">
+                                <option value="Unknown">Unknown</option>
+                                <option value="18">18</option>
+                                <option value="16">16</option>
+                                <option value="16+">16+</option>
+                                <option value="15+">15+</option>
+                                <option value="13">13</option>
+                                <option value="A">A</option>
+                                <option value="18+">18+</option>
+                                <option value="U">U</option>
+                                <option value="12+">12+</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <br>
+            <br>
+            <br>
+
+            
+
+
+            <br>
+            <br>
+            <br>
+            <!-- Submit -->
+            <input type="submit" value="Submit" class="btn btn-secondary">
+        </form>
+
+        <br>
+        <br>
+        <h3>{{ prediction_texts }}</h3>
+
+        <br>
+        <br>
+
+    </div>
+
+
+
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+<script>
+    function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+          b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        e.preventDefault();
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  /*execute a function when someone clicks in the document:*/
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+
+/*An array containing all the country names in the world:*/
+var movies=['Emilia Clarke',
+ 'Bryan Cranston',
+ 'Andrew Lincoln',
+ 'Jennifer Aniston',
+ 'Millie Bobby Brown',
+ 'Benedict Cumberbatch',
+ 'Johnny Galecki',
+ 'Michael C. Hall',
+ 'Josh Radnor',
+ 'Vince Vaughn',
+ 'Jorge Garcia',
+ 'Dominic Purcell',
+ 'Kevin Spacey',
+ 'Daniel Lapaine',
+ 'Katheryn Winnick',
+ 'Evan Rachel Wood',
+ 'Steve Carell',
+ 'Hugh Laurie',
+ 'Stephen Amell',
+ 'Jared Padalecki',
+ 'Justin Roiland',
+ 'Dan Castellaneta',
+ 'Gabriel Macht',
+ 'Charlie Cox',
+ 'Pedro Pascal',
+ "Ed O'Neill",
+ 'Cillian Murphy',
+ 'Rami Malek',
+ 'Trey Parker',
+ 'Billy Bob Thornton',
+ 'Bob Odenkirk',
+ 'Claire Danes',
+ 'Grant Gustin',
+ 'Seth MacFarlane',
+ 'James Gandolfini',
+ 'Henry Cavill',
+ 'Úrsula Corberó',
+ 'Dominic West',
+ 'Louis Hofmann',
+ 'Nina Dobrev',
+ 'Taylor Schilling',
+ 'Lady Gaga',
+ 'Jason Bateman',
+ 'Charlie Hunnam',
+ 'Dylan Minnette',
+ 'Jerry Seinfeld',
+ 'Ellen Pompeo',
+ 'Dee Bradley Baker',
+ 'Karl Urban',
+ 'Nathan Fillion',
+ 'Jon Cryer',
+ 'Mamoru Miyano',
+ 'Zach Braff',
+ 'Tom Ellis',
+ 'Jack Coleman',
+ 'Anna Paquin',
+ 'Hugh Dancy',
+ 'Andy Samberg',
+ 'Andy Whitfield',
+ 'Anna Torv',
+ 'Joel McHale',
+ 'Jonathan Groff',
+ 'Eliza Taylor',
+ 'Amy Poehler',
+ 'Billy West',
+ 'Ben McKenzie',
+ 'Ginnifer Goodwin',
+ 'Jon Hamm',
+ 'Emmy Rossum',
+ 'Yûki Kaji',
+ 'Jodie Whittaker',
+ 'Clark Gregg',
+ 'David Duchovny',
+ 'James Spader',
+ 'Krysten Ritter',
+ 'Zooey Deschanel',
+ 'Charlie Day',
+ 'Jon Bernthal',
+ 'Kyle MacLachlan',
+ 'Elisabeth Moss',
+ 'Steve Buscemi',
+ 'Kiefer Sutherland',
+ 'Simon Baker',
+ 'Hugh Bonneville',
+ 'Jim Caviezel',
+ 'Matthew Gray Gubler',
+ 'Elliot Page',
+ 'Asa Butterfield',
+ 'Kevin Connolly',
+ 'Reese Witherspoon',
+ 'Kevin McKidd',
+ 'Blake Lively',
+ 'Topher Grace',
+ 'Edward James Olmos',
+ 'Troian Bellisario',
+ 'Claire Foy',
+ 'Jessica Barden',
+ 'Penn Badgley',
+ 'Chris Conner',
+ 'Emily Deschanel',
+ 'Bae Doona',
+ 'H. Jon Benjamin',
+ 'Lea Michele',
+ "Chris O'Dowd",
+ 'Sarah Michelle Gellar',
+ 'Linda Cardellini',
+ 'Viola Davis',
+ 'Zachary Levi',
+ 'Tyler Posey',
+ 'Thomas Middleditch',
+ 'Caitriona Balfe',
+ 'Kent Williams',
+ 'Will Smith',
+ 'Idris Elba',
+ 'Peter Krause',
+ 'Mark Harmon',
+ 'K.J. Apa',
+ 'Matt Bomer',
+ 'Joseph Morgan',
+ 'Frankie Muniz',
+ 'Mike Colter',
+ 'Makoto Furukawa',
+ 'Tom Welling',
+ 'Teri Hatcher',
+ 'Tom Hardy',
+ 'Kristen Bell',
+ 'Finn Jones',
+ 'Doc Harris',
+ 'Will Arnett',
+ 'Madeleine Stowe',
+ 'Kim Dickens',
+ 'Josh Hartnett',
+ 'Tina Fey',
+ 'Melissa Benoist',
+ 'Tim Roth',
+ 'Steven Strait',
+ 'Ralph Macchio',
+ 'David Giuntoli',
+ 'Jeremy Clarkson',
+ 'Milo Ventimiglia',
+ 'Sarah Jessica Parker',
+ 'Jeff Daniels',
+ 'Janet Varney',
+ 'Larry David',
+ 'Rowan Atkinson',
+ 'Mary-Louise Parker',
+ 'Patrick Stewart',
+ 'Phoebe Waller-Bridge',
+ 'Tatiana Maslany',
+ 'Lauren Graham',
+ 'Jonny Lee Miller',
+ 'Mike Vogel',
+ 'Ricky Gervais',
+ 'Mireille Enos',
+ 'Vera Farmiga',
+ 'Scott Whyte',
+ 'Sonequa Martin-Green',
+ 'Jason Lee',
+ 'Timothy Olyphant',
+ 'Richard Madden',
+ 'David Tennant',
+ 'Nathan Stewart-Jarrett',
+ 'Jessica Parker Kennedy',
+ 'Caity Lotz',
+ 'Brit Marling',
+ 'Kat Dennings',
+ 'John Krasinski',
+ 'Kôichi Yamadera',
+ 'Ernie Hudson',
+ 'Ali Atay',
+ 'Bill Pullman',
+ 'Kevin Conroy',
+ 'Alexa Davalos',
+ 'Antony Starr',
+ 'Dolores Avery',
+ 'Pratik Gandhi',
+ 'Jodie Comer',
+ 'Alexander Dreymon',
+ 'Noah Wyle',
+ 'James Roday Rodriguez',
+ 'John Cleese',
+ 'Keri Russell',
+ 'Junko Takeuchi',
+ 'Gillian Anderson',
+ 'Richard Dean Anderson',
+ 'Kevin Bacon',
+ 'Tom Kenny',
+ 'Dan Stevens',
+ 'Mariska Hargitay',
+ 'Mischa Barton',
+ 'Billy Burke',
+ 'Rachel Brosnahan',
+ 'Simon Bird',
+ 'Justin Theroux',
+ 'Sarah Paulson',
+ "Jason O'Mara",
+ 'John Oliver',
+ 'Kiernan Shipka',
+ 'Liev Schreiber',
+ 'Laurence Fishburne',
+ 'John DiMaggio',
+ 'Kevin James',
+ 'Holly Marie Combs',
+ 'Saif Ali Khan',
+ 'Corey Stoll',
+ 'Ricky Whittle',
+ 'Kaya Scodelario',
+ 'Louis C.K.',
+ 'Jason Ritter',
+ 'Kelsey Grammer',
+ 'John Hurt',
+ 'William Shatner',
+ 'Hayley Atwell',
+ 'Maxwell Jenkins',
+ 'Tom Riley',
+ 'Michael Chiklis',
+ 'Chad Michael Murray',
+ 'Rod Serling',
+ 'Mayumi Tanaka',
+ 'Eugene Levy',
+ 'Paul Giamatti',
+ 'Jonathan Rhys Meyers',
+ 'Jôji Yanami',
+ 'Julianna Margulies',
+ 'Jeffrey Donovan',
+ 'Dominic Cooper',
+ 'Graham Chapman',
+ 'Ahmed Amin',
+ 'Kerry Washington',
+ 'Natasha Lyonne',
+ "Alex O'Loughlin",
+ 'Brenton Thwaites',
+ 'Sullivan Stapleton',
+ 'Aziz Ansari',
+ 'Tony Shalhoub',
+ 'Lena Dunham',
+ 'Zendaya',
+ 'Martin Sheen',
+ 'Lorenzo Richelmy',
+ 'Bruce Campbell',
+ 'David Boreanaz',
+ 'Ray Romano',
+ 'Tom Kane',
+ 'Ellie Kemper',
+ 'Freddie Highmore',
+ 'Vic Mignogna',
+ 'Ben Mendelsohn',
+ 'Jake McDorman',
+ 'Joe Flanigan',
+ 'Phoebe Dynevor',
+ 'Scoot McNairy',
+ 'Jennifer Jason Leigh',
+ 'Rose McIver',
+ 'Kate Mulgrew',
+ 'Courtney B. Vance',
+ 'Sofia Helin',
+ 'Issei Futamata',
+ 'Rachel Nichols',
+ 'Nick Kroll',
+ 'Tom Mison',
+ 'Drew Barrymore',
+ 'Lena Headey',
+ 'Priyanka Chopra',
+ 'Kyle Chandler',
+ 'Christina Applegate',
+ 'Jemaine Clement',
+ 'Dave Chappelle',
+ 'Dylan Moran',
+ 'Eric Dane',
+ 'Austin Butler',
+ 'Neil Patrick Harris',
+ 'Skeet Ulrich',
+ 'Lee Pace',
+ 'Katherine McNamara',
+ 'David Mitchell',
+ 'David Caruso',
+ 'Brice Armstrong',
+ 'Avery Brooks',
+ 'Elizabeth Mitchell',
+ 'Ioan Gruffudd',
+ 'Bob Saget',
+ 'Will Forte',
+ 'Dylan Walsh',
+ 'Dafne Keen',
+ 'Donald Glover',
+ 'Siobhan Fallon Hogan',
+ 'Gethin Anthony',
+ 'Danny McBride',
+ 'Johnny Yong Bosch',
+ 'Eric McCormack',
+ 'Pankaj Tripathi',
+ 'Megumi Ogata',
+ 'Anthony Edwards',
+ 'Jessica Hynes',
+ 'Alan Alda',
+ 'Robert Lee',
+ 'Matt Ryan',
+ 'Darin Brooks',
+ 'Maggie Q',
+ "Chris O'Donnell",
+ 'Itzan Escamilla',
+ 'Jeremy Irons',
+ 'Colin Ferguson',
+ 'Ted Danson',
+ 'Masako Nozawa',
+ 'Anson Mount',
+ 'Robert Carlyle',
+ 'Abbi Jacobson',
+ 'John Lithgow',
+ 'Eddie McClintock',
+ 'Travis Fimmel',
+ 'Elyes Gabel',
+ 'Titus Welliver',
+ 'Sarah Snook',
+ 'Scott Bakula',
+ 'Eliza Dushku',
+ 'David Jason',
+ 'Orlando Bloom',
+ 'Rachel Bilson',
+ 'Blake Anderson',
+ 'Phil LaMarr',
+ 'Bill Hader',
+ 'Mike Judge',
+ 'Julia Louis-Dreyfus',
+ 'Jennifer Garner',
+ 'Daniel Brühl',
+ 'Britt Robertson',
+ 'Omar Sy',
+ 'Patricia Heaton',
+ 'Jon Stewart',
+ 'Lily Collins',
+ 'Stella Maeve',
+ 'Mark Duplass',
+ 'Gary Sinise',
+ 'André Holland',
+ 'Kath Soucie',
+ 'Adelaide Kane',
+ 'The Saturday Night Live Band',
+ 'Samuel Barnett',
+ 'Jack Davenport',
+ 'Jennifer Love Hewitt',
+ 'Timothy Hutton',
+ 'Ashley Rickards',
+ 'Michael J. Anderson',
+ 'Jacqueline McKenzie',
+ 'Shenae Grimes-Beech',
+ 'Jason Momoa',
+ 'Lucy Lawless',
+ 'Darby Stanchfield',
+ 'Adeel Akhtar',
+ 'Daniel Wu',
+ 'Sophia Lillis',
+ 'Carl Lumbly',
+ 'Matt LeBlanc',
+ 'Kazuya Nakai',
+ 'Grant Bowler',
+ 'Courteney Cox',
+ 'Aaron Stanford',
+ 'Alison Brie',
+ 'Robbie Amell',
+ 'Jaideep Ahlawat',
+ 'Ellen Muth',
+ 'Drew Carey',
+ 'Elijah Wood',
+ 'Tim Allen',
+ 'America Ferrera',
+ 'Omari Hardwick',
+ 'Roseanne Barr',
+ 'Seth Green',
+ 'Rob Morrow',
+ 'Lily Tomlin',
+ "Melissa O'Neil",
+ 'Ben Savage',
+ 'Gina Rodriguez',
+ 'Richard Armitage',
+ 'Jesse Spencer',
+ 'John Barrowman',
+ 'Bill Skarsgård',
+ 'Mike Henry',
+ 'Sarah Jones',
+ 'David Suchet',
+ 'Marty Grabstein',
+ 'Dwayne Johnson',
+ 'Amybeth McNulty',
+ 'Veronica Taylor',
+ 'Michelle Monaghan',
+ 'Stephen Colbert',
+ 'Cedric Smith',
+ 'Fran Drescher',
+ 'Terrence Howard',
+ 'John Paul Tremblay',
+ 'Cathy Cavadini',
+ 'Gillian Jacobs',
+ 'Jason Sudeikis',
+ 'Jared Harris',
+ 'Miley Cyrus',
+ 'Famke Janssen',
+ 'Abigail Spencer',
+ 'Natsuki Hanae',
+ 'Yoshitsugu Matsuoka',
+ 'Dermot Morgan',
+ 'Kayvan Novak',
+ 'James Van Der Beek',
+ 'Katherine Parkinson',
+ 'Daiki Yamashita',
+ 'Drake Bell',
+ 'Caroline Abras',
+ 'Emily Rose',
+ 'William Hartnell',
+ 'Vincent Martella',
+ 'Damon Wayans',
+ 'Lucas Neff',
+ 'Kristin Kreuk',
+ 'Michael Sheen',
+ 'Iain Armitage',
+ 'Emma Roberts',
+ 'Melissa Joan Hart',
+ 'Diane Guerrero',
+ 'Adrian Dunbar',
+ 'George Peppard',
+ 'Eliza Coupe',
+ 'Fred Savage',
+ 'Terry Crews',
+ 'Jim Belushi',
+ 'Willa Fitzgerald',
+ 'Tara Strong',
+ 'Ashton Kutcher',
+ 'Sarah Lancashire',
+ 'Brian Quinn',
+ 'Ben Browder',
+ 'Craig Horner',
+ 'Matt Hill',
+ 'Christopher Meloni',
+ 'Miranda Cosgrove',
+ 'Alan Reed',
+ 'Jeff Bennett',
+ 'Fred Armisen',
+ 'Russell Hodgkinson',
+ 'Cole Sprouse',
+ 'Chris Barrie',
+ 'Damian Lewis',
+ 'Donnie Wahlberg',
+ 'Camrus Johnson',
+ 'Mark-Paul Gosselaar',
+ 'Joji',
+ 'Kevin Costner',
+ 'Christina Hendricks',
+ 'Elizabeth Daily',
+ 'Jerry Orbach',
+ 'Jesse McCartney',
+ 'Bea Arthur',
+ 'Patrick Warburton',
+ "Mihaly 'Michu' Meszaros",
+ 'Çagatay Ulusoy',
+ 'Ryan Phillippe',
+ 'Jason Schwartzman',
+ 'Wendi McLendon-Covey',
+ 'Bill Cosby',
+ 'Manoj Bajpayee',
+ 'Jason Priestley',
+ 'Matthew Goode',
+ 'Mel Blanc',
+ 'Taylor Gray',
+ 'Stephen Moyer',
+ 'Al Pacino',
+ 'Alba August',
+ 'Jessica Alba',
+ 'Cam Clarke',
+ 'Francesca Marie Smith',
+ 'Calista Flockhart',
+ 'Jeremy Sisto',
+ 'Josh Holloway',
+ 'Giovanni Ribisi',
+ 'David Hasselhoff',
+ 'Don Messick',
+ 'Karl Pilkington',
+ 'Ju Ji-Hoon',
+ 'J.G. Quintel',
+ 'Charlie Sheen',
+ 'Angie Harmon',
+ 'Salvatore Esposito',
+ 'Selena Gomez',
+ 'Alan Davies',
+ 'Bill Burr',
+ 'Alan Young',
+ 'Philip Winchester',
+ 'Robert Taylor',
+ 'Jonathan Majors',
+ 'Nobutoshi Canna',
+ 'John Simm',
+ 'Anna Silk',
+ 'Mindy Kaling',
+ 'Allison Janney',
+ 'Jenna Elfman',
+ 'Jason Beghe',
+ 'Peter Falk',
+ 'Billy Campbell',
+ 'Engin Altan Düzyatan',
+ 'Maurice LaMarche',
+ 'Josefine Frida Pettersen',
+ 'Mira Furlan',
+ 'Matt Dallas',
+ 'Mayur More',
+ 'Glenn Close',
+ 'Daveed Diggs',
+ 'Adam Scott',
+ 'David Strathairn',
+ 'Kevin Sorbo',
+ 'Erdal Besikçioglu',
+ 'Kenan Imirzalioglu',
+ 'Shiri Appleby',
+ 'Tyler Alvarez',
+ 'Christopher Daniel Barnes',
+ 'Ilana Glazer',
+ 'Piper Perabo',
+ 'Regina King',
+ 'Khloé Kardashian',
+ 'Steven Van Zandt',
+ 'Jitendra Kumar',
+ 'Michael J. Fox',
+ 'Hynden Walch',
+ 'Arshad Warsi',
+ 'Ivaylo Zahariev',
+ 'Esme Creed-Miles',
+ 'Aidan Turner',
+ 'Josh Duhamel',
+ 'Zach Callison',
+ 'AnnaSophia Robb',
+ 'Patricia Arquette',
+ 'Adam Gibbs',
+ 'Ben Feldman',
+ 'Alfonso Herrera',
+ 'Elaine Cassidy',
+ 'Paul Rudd',
+ 'James Franco',
+ 'Denis Leary',
+ 'Candace Cameron Bure',
+ 'Reginald VelJohnson',
+ 'Edie Falco',
+ 'Teri Polo',
+ 'Jay Harrington',
+ 'Katee Sackhoff',
+ 'Aden Young',
+ 'Michael Cudlitz',
+ 'Maitreyi Ramakrishnan',
+ 'Tiff Needell',
+ 'Will Friedle',
+ 'Kathryn Morris',
+ 'Michael Douglas',
+ 'Sofie Gråbøl',
+ 'Sam Witwer',
+ 'Anna Friel',
+ 'Julia Ormond',
+ 'Jennifer Beals',
+ 'Stephen Collins',
+ 'John Nettles',
+ 'Shawn Hatosy',
+ 'Lenora Crichlow',
+ 'Katey Sagal',
+ 'Eric Stoltz',
+ 'Don Cheadle',
+ 'Christy Carlson Romano',
+ 'Elise Baughman',
+ 'Gorden Kaye',
+ 'Christopher McCulloch',
+ 'Chris Geere',
+ 'Clark Duke',
+ 'Katherine Langford',
+ 'Don Johnson',
+ 'Halle Berry',
+ 'Matthew Perry',
+ 'Tracy Grandstaff',
+ 'Bret Harrison',
+ 'Hayden Panettiere',
+ 'Billy Gardell',
+ 'Bryce Papenbrook',
+ 'Joseph Fiennes',
+ 'Joel Hodgson',
+ 'Mat Lucas',
+ 'Katie Leclerc',
+ 'Dave Willis',
+ 'Kathryn Erbe',
+ "Sammi 'Sweetheart' Giancola",
+ 'Gael García Bernal',
+ 'Kyra Sedgwick',
+ 'Andrew Lawrence',
+ 'Christopher Egan',
+ 'Dallas Roberts',
+ 'Jenna Coleman',
+ 'Kate Walsh',
+ "Conan O'Brien",
+ 'Jim Henson',
+ 'Tom Selleck',
+ 'Randall Park',
+ 'Logan Browning',
+ 'Marguerite Moreau',
+ 'Bobby Deol',
+ 'Melissa Roxburgh',
+ 'Morgan Spector',
+ 'Rhenzy Feliz',
+ 'Janet Montgomery',
+ 'Manjot Singh',
+ 'Lucille Ball',
+ 'Adam Rayner',
+ 'J.K. Simmons',
+ 'Matt Lucas',
+ 'Jeff Probst',
+ 'Dan Russell',
+ 'Sumeet Vyas',
+ 'Ana Ortiz',
+ 'Bianca Comparato',
+ 'Tchéky Karyo',
+ 'Toni Collette',
+ 'James Wolk',
+ 'Bear Grylls',
+ 'Sumire Morohoshi',
+ 'Bobby Cannavale',
+ 'John Kassir',
+ 'Johnny Knoxville',
+ 'Nafessa Williams',
+ 'Dave Annable',
+ 'Angela Bassett',
+ 'Rob Paulsen',
+ 'Robert Glenister',
+ 'Josh Hutcherson',
+ 'Abigail Cowen',
+ 'Neil Sterenberg',
+ 'Dean Cain',
+ 'Alba Baptista',
+ 'Jeffrey Tambor',
+ 'Paul Reiser',
+ 'Stephan James',
+ 'Saoirse-Monica Jackson',
+ 'Justice Smith',
+ 'Andre Braugher',
+ 'Pauline Etienne',
+ 'Anne Hathaway',
+ 'Jake Manley',
+ 'Ryan Seacrest',
+ 'Thomas Jane',
+ 'John Kricfalusi',
+ 'Jim Cummings',
+ 'Greg Eagles',
+ 'Hidenobu Kiuchi',
+ 'Chris Addison',
+ 'Luke Pasqualino',
+ 'Cherami Leigh',
+ 'Maximilian Mundt',
+ 'Hilary Swank',
+ 'Julian Barratt',
+ 'Steve Blum',
+ 'Frank Welker',
+ 'Jason Isaacs',
+ 'Christine Baranski',
+ 'Vanessa Redgrave',
+ 'Hannah John-Kamen',
+ 'Ariana Grande',
+ 'Dennis Haysbert',
+ 'Richard Steven Horvitz',
+ 'Crystal Reed',
+ 'Alexandra Breckenridge',
+ 'Ritvik Sahore',
+ 'Téa Leoni',
+ 'Bill Paxton',
+ 'Kaley Cuoco',
+ 'David Stakston',
+ 'Jeremy Brett',
+ 'Kathryn Newton',
+ 'Öykü Karayel',
+ 'Richard Dormer',
+ 'Murat Cemcir',
+ 'Anthony Anderson',
+ 'Nathan Fielder',
+ 'Vishesh Bansal',
+ 'Lauren Ambrose',
+ 'Valtteri Bottas',
+ 'Sidse Babett Knudsen',
+ 'Alice Braga',
+ 'Jamie Bell',
+ 'Ray Panthaki',
+ 'Anne Consigny',
+ 'Andy Berman',
+ 'Mj Rodriguez',
+ 'Danielle Rose Russell',
+ 'Keith Ferguson',
+ 'Lior Raz',
+ 'Matthew Macfadyen',
+ 'Masaya Onosaka',
+ 'Carlos Alazraqui',
+ 'Mark Feuerstein',
+ 'Amanda Tapping',
+ 'Shailene Woodley',
+ 'Rebecca Romijn',
+ 'Bess Armstrong',
+ 'Volker Bruch',
+ 'D.J. Cotrona',
+ 'Ashleigh Ball',
+ 'Adam West',
+ 'Jean-Luc Bilodeau',
+ 'Christina Ricci',
+ 'Chase Stokes',
+ 'Adam Carolla',
+ 'Shaun Evans',
+ 'Don Adams',
+ 'Michael Peterson',
+ 'Justin Chu Cary',
+ 'Gale Harold',
+ 'Angela Lansbury',
+ 'Bridgit Mendler',
+ 'Matt Czuchry',
+ "George O'Hanlon",
+ 'Steve Coogan',
+ 'Dan Green',
+ 'Santiago Cabrera',
+ 'Gordon Ramsay',
+ 'Charlie Adler',
+ 'Ben Platt',
+ 'Melissa Gilbert',
+ 'Brooke Elliott',
+ 'Cybill Shepherd',
+ 'Melanie Scrofano',
+ 'Anthony LaPaglia',
+ 'Jennifer Saunders',
+ 'Keegan-Michael Key',
+ 'Laura San Giacomo',
+ 'Alexandra Chando',
+ 'Kelly Overton',
+ 'Elle Fanning',
+ 'Shirô Saitô',
+ 'Debi Derryberry',
+ 'Patrick Fugit',
+ 'Raven-Symoné',
+ 'Demián Bichir',
+ 'Kay Kay Menon',
+ 'Jackie Chan',
+ 'Sutton Foster',
+ 'Beren Saat',
+ 'Mayo Suzukaze',
+ 'Hilary Duff',
+ 'Elizabeth Montgomery',
+ 'Scott Menville',
+ 'Kate Atkinson',
+ 'Peter Cullen',
+ 'Sayani Gupta',
+ 'Rachael Taylor',
+ 'Andrew Koji',
+ 'Mark Valley',
+ 'Olivia Holt',
+ 'Laurence Rupp',
+ 'Adrianne Curry',
+ 'Kento Yamazaki',
+ 'Sacha Baron Cohen',
+ 'Lucas Till',
+ 'Tom Cullen',
+ 'Mathew Horne',
+ 'Thomas Lennon',
+ 'Rachel Bloom',
+ 'Aimee Teegarden',
+ 'Morgan Freeman',
+ 'Poppy Montgomery',
+ 'Dylan McDermott',
+ 'Sôma Saitô',
+ 'Paula Burrows',
+ "Colin O'Meara",
+ 'Alba Flores',
+ 'Ryan Eggold',
+ "Jerry O'Connell",
+ 'Stuart Pankin',
+ 'Brendan Gleeson',
+ 'Hugh Dillon',
+ 'David James Elliott',
+ 'Thumindu Dodantenne',
+ 'Debra Messing',
+ 'Ron Howard',
+ 'Laura Vandervoort',
+ 'John Erwin',
+ 'David Winn',
+ 'Jimmy Fallon',
+ 'Johnny Flynn',
+ 'Jay Baruchel',
+ 'Samantha Colley',
+ 'Bob McFadden',
+ 'Gülse Birsel',
+ 'Bruce Greenwood',
+ 'Dylan Sprouse',
+ 'Ólafur Darri Ólafsson',
+ 'Missy Peregrym',
+ 'Larry D. Mann',
+ 'Jim Carrey',
+ 'Daniel Sunjata',
+ 'Sharon Horgan',
+ 'Leslie Nielsen',
+ 'Devon Werkheiser',
+ 'Jonas Armstrong',
+ 'Kana Hanazawa',
+ 'Zawe Ashton',
+ 'Daniel Sharman',
+ 'Peter Serafinowicz',
+ 'Setsuo Ito',
+ 'Traylor Howard',
+ 'Madhavan',
+ 'Connie Britton',
+ 'Ellen DeGeneres',
+ 'Brendon Small',
+ 'David Kaufman',
+ 'Bobby Berk',
+ 'RuPaul',
+ 'Dana Delany',
+ 'Gabriel Byrne',
+ 'Rick Harrison',
+ 'Chuck Norris',
+ 'Suranne Jones',
+ 'Colin Ford',
+ 'Frank Grillo',
+ 'Halit Ergenç',
+ 'Nick Gehlfuss',
+ "Jahi Di'Allo Winston",
+ 'David Threlfall',
+ 'Satish Shah',
+ 'Josh Thomas',
+ 'Ahmet Kural',
+ 'Marco de la O',
+ 'Patrick Brammall',
+ 'Bryan Greenberg',
+ 'Elizabeth Gillies',
+ 'Michael Weatherly',
+ 'Kåre Conradi',
+ 'Alfred Hitchcock',
+ 'Domenick Lombardozzi',
+ 'Michael T. Weiss',
+ 'Daniel Tosh',
+ 'Omar Epps',
+ 'Elizabeth Bourgine',
+ 'Yuri Lowenthal',
+ 'Geoff Stults',
+ 'Cameron Cuffe',
+ 'Kappei Yamaguchi',
+ 'Warwick Davis',
+ 'John Astin',
+ 'Peter Firth',
+ 'Katherine Kelly',
+ 'Keith David',
+ 'Mary Katherine Ham',
+ 'Andrea Riseborough',
+ 'Jimmy Kimmel',
+ 'Shemar Moore',
+ 'Josh Grelle',
+ 'Tamsin Greig',
+ 'Jake McLaughlin',
+ 'Naoya Uchida',
+ 'Donal Logue',
+ 'Joshua Sasse',
+ 'Jared Keeso',
+ 'Ron Cook',
+ 'Naomi Watts',
+ 'Arun Govil',
+ 'Kenan Thompson',
+ 'Patricia Routledge',
+ 'Laura Haddock',
+ 'Laura Linney',
+ "Carroll O'Connor",
+ 'Adrian Paul',
+ 'George Blagden',
+ 'Kaitlin Olson',
+ 'James Rolfe',
+ 'Daniel Zolghadri',
+ 'Matthew Rhys',
+ 'Emily Osment',
+ 'Lorne Greene',
+ 'Rita Volk',
+ 'Tim Daly',
+ 'Jihae',
+ 'Essie Davis',
+ 'Jamie Lynn Spears',
+ 'Rosa Salazar',
+ 'Sarah Chalke',
+ 'Jonathan Tucker',
+ 'Shia LaBeouf',
+ 'Alan Thicke',
+ 'Melonie Diaz',
+ 'Khandi Alexander',
+ 'Dan Barber',
+ 'Ed Gilbert',
+ 'Dave Foley',
+ 'Phil Keoghan',
+ 'Rik Mayall',
+ 'Shefali Shah',
+ 'Barbara Eden',
+ 'Whoopi Goldberg',
+ 'Andrew Lee Potts',
+ 'Charlie Saxton',
+ 'Eric André',
+ 'Ross Hull',
+ 'Reba McEntire',
+ 'James Norton',
+ 'Jack Black',
+ 'Ashley Walters',
+ 'Justina Machado',
+ 'Miranda Hart',
+ 'Necati Sasmaz',
+ 'Eric Loomis',
+ 'Benedict Wong',
+ 'Shahar Isaac',
+ 'Lacey Chabert',
+ 'Jordan Peele',
+ 'Gizem Erdogan',
+ 'Harish Bhimani',
+ 'Tom Payne',
+ 'Treat Williams',
+ 'Rowan Blanchard',
+ 'Bob Denver',
+ 'Joel Kinnaman',
+ 'Zoe Levin',
+ 'Debby Ryan',
+ 'Issa Rae',
+ 'Colin Hanks',
+ 'Gabriel Chavarria',
+ 'Kenneth Branagh',
+ 'Martin Clunes',
+ 'David Letterman',
+ 'Peyton List',
+ 'Patrick Duffy',
+ 'Adam Brody',
+ 'Michael Kitchen',
+ 'Paul Eddington',
+ 'Luke Newberry',
+ 'Billie Piper',
+ 'Josh Blaylock',
+ 'Reece Shearsmith',
+ 'Sean Bean',
+ 'Alyssa Milano',
+ 'Nicola Walker',
+ 'Cariba Heine',
+ 'Fred Gwynne',
+ 'Kôji Yusa',
+ 'Stana Katic',
+ 'François Arnaud',
+ 'Ritwik Bhowmik',
+ 'Robert Reed',
+ 'Whitney Cummings',
+ 'Bill Maher',
+ 'Patrick McGoohan',
+ 'Josh Gad',
+ 'Amanda Bynes',
+ 'John Ritter',
+ 'John Goodman',
+ 'Tom Wlaschiha',
+ 'Andy Griffith',
+ 'Hyun Bin',
+ 'Louis Hunter',
+ 'Valerie Bertinelli',
+ 'J.T. Turner',
+ 'Pamela Adlon',
+ 'Todd Haberkorn',
+ 'Megumi Toyoguchi',
+ 'Gianni Calchetti',
+ 'Larry Hagman',
+ 'Justin Fletcher',
+ 'Michael Chernus',
+ 'Blanca Suárez',
+ 'Caroline Dhavernas',
+ 'JD Pardo',
+ 'Robin Williams',
+ 'Ian Somerhalder',
+ 'Alex Roe',
+ 'Jeffrey Dean Morgan',
+ 'Ian Carter',
+ 'Mary McDonnell',
+ 'R.L. Stine',
+ 'Dawn French',
+ 'Katja Herbers',
+ "Brian O'Halloran",
+ 'Eric Edelstein',
+ 'Bill Bixby',
+ 'Matt Passmore',
+ 'Ben Rappaport',
+ 'Phil Hendrie',
+ 'Yûto Nakano',
+ 'Hiroshi Kamiya',
+ 'Dennis Franz',
+ 'Victoire Du Bois',
+ 'Adria Arjona',
+ 'Adrian Edmondson',
+ 'Alessandro Borghi',
+ 'William Fichtner',
+ 'Karen Gillan',
+ 'Gong Yoo',
+ 'Nicky Jones',
+ 'Abhishek Bachchan',
+ 'Amy Schumer',
+ 'Eoin Macken',
+ 'Stephen Fry',
+ 'Susan Roman',
+ 'Robert Kazinsky',
+ 'Stephen Merchant',
+ 'Judd Hirsch',
+ 'Richard Belzer',
+ 'Tom Wopat',
+ 'Blake Shelton',
+ 'Bella Thorne']
+/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+autocomplete(document.getElementById("myInput"), movies);
+</script>
+</body>
+
+</html>

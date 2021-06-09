@@ -1,0 +1,520 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation</title>
+
+
+    <!-- BootStrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+
+    <!-- css -->
+    <link rel="stylesheet" href="static/css/styles.css">
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- As a heading -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">You May Like:</a>
+            </div>
+        </div>
+    </nav>
+
+    <br><br><br>
+
+
+    <div class="container">
+
+
+
+        <form action="\recommend" method="post">
+
+<div class="autocomplete" style="width:300px;">
+    <input id="myInput" type="text" name="name" placeholder="name">
+  </div>
+            <br>
+            <br>
+  <input type="submit" class="btn btn-secondary">
+        </form>
+
+
+
+
+    </div>
+{% if val %}
+<ol>
+<!-- For loop logic of jinja template -->
+   {% for movie,link in movie_names.items() %}
+
+    <li>{{movie}}</li> <a href="{{link}}">Get more Info!!!</a>
+   {% endfor %}
+</ol>
+{% endif %}
+
+    <!-- JavaScript -->
+
+<script>
+    function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+          b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        e.preventDefault();
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  /*execute a function when someone clicks in the document:*/
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+
+/*An array containing all the country names in the world:*/
+var movies=['Black Panther', 'Avengers: Endgame',
+       'Mission: Impossible -- Fallout', 'Mad Max: Fury Road',
+       'Spider-Man: Into the Spider-Verse', 'Wonder Woman', 'Dunkirk',
+       'Coco', 'Thor: Ragnarok', 'Logan', 'Star Wars: The Last Jedi',
+       'Star Wars: The Force Awakens', 'The Adventures of Robin Hood',
+       'King Kong', 'Spider-Man: Far From Home', 'Incredibles 2',
+       'Zootopia', 'War for the Planet of the Apes',
+       'Spider-Man: Homecoming', 'Baby Driver', 'Seven Samurai',
+       'Metropolis', 'Jaws', 'Up', 'Shazam!', 'The Dark Knight',
+       'The Treasure of the Sierra Madre', 'Blade Runner 2049',
+       'The 39 Steps', 'Captain America: Civil War', 'The Jungle Book',
+       'Harry Potter and the Deathly Hallows: Part 2', 'Skyfall',
+       'Lawrence of Arabia', 'Mission: Impossible Rogue Nation',
+       'Apocalypse Now', 'The Hurt Locker', 'The LEGO Movie', 'Star Trek',
+       'Moana', 'Avengers: Infinity War', 'Ant-Man and The Wasp',
+       'Star Wars', 'Isle of Dogs', 'Stagecoach', 'Goldfinger',
+       'Guardians of the Galaxy', 'Kubo and the Two Strings', 'WALL-E',
+       "Marvel's the Avengers", 'Iron Man', 'The Terminator',
+       'The African Queen', 'Rio Bravo', 'Hunt for the Wilderpeople',
+       'The French Connection', 'The Taking of Pelham One Two Three',
+       'John Wick: Chapter 3 -- Parabellum', 'Doctor Strange', 'Aliens',
+       'The Empire Strikes Back', 'Paths of Glory', 'True Grit',
+       'X-Men: Days of Future Past', 'The Bridge on the River Kwai',
+       'Badlands', 'Gun Crazy', 'All Is Lost', 'The LEGO Batman Movie',
+       'The Princess Bride', 'Looper', 'Chicken Run', 'Stalker',
+       'Casino Royale', 'Guardians of the Galaxy Vol. 2',
+       'The Peanut Butter Falcon', 'No Country for Old Men',
+       'Dawn of the Planet of the Apes', 'Captain Marvel', 'Onward',
+       'Sicario', 'Ghostbusters', 'Ran', 'A Fistful of Dollars',
+       'Henry V', 'The Lord of the Rings: The Two Towers',
+       'Captain America: The Winter Soldier', 'Back to the Future',
+       'Assault on Precinct 13', 'The Searchers', 'Deadpool 2',
+       'Aguirre: The Wrath of God', 'Crouching Tiger, Hidden Dragon',
+       'The Fugitive', 'Apollo 13', 'The Lion King', 'Bullitt',
+       'Catch Me if You Can', 'Annihilation', 'Who Framed Roger Rabbit',
+       'Toy Story 4', 'Inside Out', 'Snow White and the Seven Dwarfs',
+       'Paddington 2', 'Toy Story 3', 'Toy Story 2', 'Pinocchio',
+       'Finding Dory', 'Finding Nemo', 'Toy Story',
+       'How to Train Your Dragon', 'Shaun the Sheep Movie', 'Dumbo',
+       'Ratatouille', 'My Life as a Zucchini', 'The Incredibles',
+       'Only Yesterday', 'One Hundred and One Dalmatians',
+       'Beauty and the Beast', 'The Nightmare Before Christmas',
+       'Anomalisa', 'Monsters, Inc.', 'Grave of the Fireflies',
+       'Fantasia', 'Your Name', 'Spirited Away', 'The Iron Giant',
+       'Song of the Sea', 'Tower', 'Waltz With Bashir',
+       'How to Train Your Dragon: The Hidden World', 'Persepolis',
+       'Wallace & Gromit: The Curse of the Were-Rabbit',
+       'Yellow Submarine', 'Fantastic Mr. Fox', "Kiki's Delivery Service",
+       'Ernest & Célestine', 'Aladdin', 'The Secret World of Arrietty',
+       'Frozen', 'Ralph Breaks the Internet', 'The Red Turtle',
+       'Long Way North', 'How to Train Your Dragon 2', 'Coraline',
+       'Ghost in the Shell', 'The Breadwinner', 'I Lost My Body',
+       'A Shaun the Sheep Movie: Farmageddon', 'The Little Mermaid',
+       'Lady and the Tramp', 'The Triplets of Belleville', 'Big Hero 6',
+       'My Neighbor Totoro', 'Princess Mononoke', 'Bambi',
+       'Arthur Christmas', 'Antz', 'The LEGO Movie 2: The Second Part',
+       "A Bug's Life", 'Mary and Max', 'Ponyo', 'Klaus',
+       'Teen Titans GO! to the Movies', 'Bolt', 'Tangled', 'Shrek 2',
+       'ParaNorman', 'Frankenweenie', 'James and the Giant Peach',
+       'Rango', 'Shrek', 'Missing Link', 'The Wind Rises',
+       'Winnie the Pooh', 'The Simpsons Movie', 'Boy and the World',
+       'The Peanuts Movie', 'Millennium Actress', 'When Marnie Was There',
+       'Kung Fu Panda', 'Sleeping Beauty', 'Wreck-It Ralph',
+       'Kung Fu Panda 3', 'The Illusionist', 'Parasite',
+       'The Cabinet of Dr. Caligari', 'Grand Illusion', 'Nosferatu',
+       'The Battle of Algiers', 'Shoplifters', 'M', 'The 400 Blows',
+       'Rashomon', 'Army in the Shadows', 'Tokyo Story', 'Potemkin',
+       'The Wages of Fear', 'Open City', 'The Umbrellas of Cherbourg',
+       'Nights of Cabiria', 'La dolce vita', 'Let the Right One In',
+       'Balthazar', 'The Passion of Joan of Arc', 'The Conformist',
+       'The Discreet Charm of the Bourgeoisie', 'Faces Places',
+       'A Separation', 'Things to Come', 'Song of the Road',
+       'The Salesman', '8 1/2', 'Tampopo', 'Gloria', 'Ikiru',
+       'Eyes Without a Face', 'Amy', 'The Leopard',
+       'The Tale of the Princess Kaguya', 'A Fantastic Woman',
+       'Children of Paradise', 'Three Colors: Red',
+       'BPM (Beats Per Minute)', 'Sing Street', 'Burning', 'Playtime',
+       'The Blue Angel', "God's Own Country", 'The Red Circle',
+       'Loveless', 'The Rules of the Game',
+       'Gett: The Trial of Viviane Amsalem', 'Wings of Desire',
+       'The Road', 'Toni Erdmann', 'The Young Girls of Rochefort',
+       'Timbuktu', 'Jiro Dreams of Sushi', 'Border', 'Still Walking',
+       'All About My Mother', 'Poetry', "The Band's Visit",
+       'The Seventh Seal', 'Waste Land', 'The Taste of Others',
+       'Godzilla', 'Amour', 'Embrace of the Serpent', 'After the Storm',
+       'The Vanishing', 'Afghan Star', 'Transit', 'Project Nim', 'Blue',
+       'Elevator to the Gallows', 'Monsieur Lazhar', 'Darbareye Elly',
+       'Fireworks Wednesday', 'The Class', 'Last Train Home',
+       'Maria Full of Grace', 'The Look of Silence', 'My Left Foot',
+       'Nostalgia for the Light', 'Throne of Blood', 'A Prophet',
+       'Mafioso', 'Solaris', 'The Kid with a Bike',
+       'My Beautiful Laundrette', 'Moolaadé', 'It Happened One Night',
+       'Citizen Kane', 'Casablanca', 'The Wizard of Oz', 'All About Eve',
+       'Rebecca', 'Modern Times', 'A Night at the Opera', 'The Third Man',
+       "Singin' in the Rain", 'All Quiet on the Western Front',
+       'On the Waterfront', 'The Kid', 'Psycho', 'Laura',
+       'Shadow of a Doubt', 'Sunset Blvd.', "A Hard Day's Night",
+       'Top Hat', 'North by Northwest', 'The Philadelphia Story',
+       '12 Angry Men', 'Bride of Frankenstein', 'Chinatown',
+       'A Streetcar Named Desire', 'The Lady Eve', 'The Lady Vanishes',
+       'Dr. Strangelove Or: How I Learned to Stop Worrying and Love the Bomb',
+       'An American in Paris', 'The Thin Man', 'Kind Hearts and Coronets',
+       'Touch of Evil', 'His Girl Friday', 'Frankenstein',
+       "It's a Wonderful Life", 'Vertigo', 'The Grapes of Wrath',
+       'The Gold Rush', 'The Last Picture Show', 'The Big Sleep',
+       'Scarface', 'Rear Window', 'The Red Shoes', 'Cool Hand Luke',
+       'Invasion of the Body Snatchers', 'City Lights',
+       'Anatomy of a Murder', 'The Best Years of Our Lives',
+       'Roman Holiday', 'Gone With the Wind', 'Sweet Smell of Success',
+       'Freaks', 'In a Lonely Place', '2001: A Space Odyssey',
+       'Night of the Living Dead', 'Notorious', 'The Lost Weekend',
+       'Miracle on 34th Street', 'The Day the Earth Stood Still',
+       'Gentlemen Prefer Blondes', 'Detour', "Rosemary's Baby",
+       'Repulsion', 'The Invisible Man', 'Kiss Me Deadly',
+       'Stormy Weather', 'The Manchurian Candidate', 'Marty',
+       "One Flew Over the Cuckoo's Nest", 'Mary Poppins',
+       'Some Like It Hot', 'Lady Bird', 'BlacKkKlansman', 'Eighth Grade',
+       'Booksmart', 'The Farewell', 'The Big Sick',
+       'Once Upon a Time... In Hollywood', 'La La Land',
+       'Three Billboards Outside Ebbing, Missouri', 'Crazy Rich Asians',
+       'Paterson', 'Sorry to Bother You', 'The Disaster Artist',
+       'Birdman or (The Unexpected Virtue of Ignorance)',
+       'Monty Python and the Holy Grail', 'The Artist',
+       'The Death of Stalin', 'Spy', 'Palm Springs',
+       'The Grand Budapest Hotel', 'Annie Hall', 'Love & Friendship',
+       'Logan Lucky', 'Sideways', 'The Nice Guys',
+       'Fighting With My Family', 'Moonrise Kingdom', 'Airplane!',
+       'The Forty-Year-Old Version', 'What We Do in the Shadows',
+       'Paddington', "Don't Think Twice", 'Saint Frances',
+       'Bringing Up Baby', 'Blow the Man Down', 'To Be or Not to Be',
+       'Groundhog Day', 'The Player', "You Can't Take It With You",
+       'The Truman Show', 'Big', 'Enough Said', 'The Apartment',
+       'Bull Durham', 'The Edge of Seventeen', 'The Muppets',
+       'Broadcast News', 'Silver Linings Playbook', 'Lost in Translation',
+       'Mr. Smith Goes to Washington', "Won't You Be My Neighbor?",
+       'I Am Not Your Negro', 'Apollo 11', 'Life Itself', 'Man on Wire',
+       'Amazing Grace', 'Minding the Gap', 'Three Identical Strangers',
+       'McQueen', 'Crip Camp', '20 Feet From Stardom', 'Weiner',
+       'Collective', 'Dick Johnson Is Dead', 'Free Solo',
+       'The Last Waltz', 'Kedi', 'Totally Under Control',
+       'Stop Making Sense', 'Knock Down the House', 'Blackfish',
+       'Taxi to the Dark Side', 'Time', 'Maiden', 'Murderball',
+       "Jodorowsky's Dune", 'Welcome to Chechnya', 'Shirkers',
+       'Anvil! The Story of Anvil', 'Inside Job',
+       'All In: The Fight for Democracy', 'The Square',
+       'Seymour: An Introduction', 'The Missing Picture',
+       'Mucho Mucho Amor: The Legend of Walter Mercado',
+       'Deliver Us From Evil', 'Paris Is Burning', 'Athlete A',
+       'One Child Nation',
+       'Bright Lights: Starring Carrie Fisher and Debbie Reynolds',
+       'Hoop Dreams', 'Citizenfour', 'On the Record', 'The Interrupters',
+       'Slay the Dragon', 'Strong Island', 'Iris',
+       'Capturing the Friedmans', 'The Fight',
+       'Mr. Death: The Rise and Fall of Fred A. Leuchter, Jr.', 'Rewind',
+       'Nothing Like a Dame', 'A Secret Love', 'The Invisible War',
+       'Sound City', '56 Up', 'Elaine Stritch: Shoot Me',
+       'My Journey Through French Cinema', 'The Act of Killing',
+       'More Than Honey', 'Everyday Sunshine: The Story of Fishbone',
+       'Bill Cunningham New York', 'Spellbound', 'We Were Here',
+       'Enron: The Smartest Guys in the Room',
+       'Sholem Aleichem: Laughing in the Darkness',
+       'Ai Weiwei: Never Sorry', '13TH',
+       'Rivers and Tides: Andy Goldsworthy With Time',
+       'How to Survive a Plague', 'This Is Not a Film',
+       'When We Were Kings', 'RBG', 'The Painter and the Thief',
+       'March of the Penguins', 'Hitchcock/Truffaut',
+       'Kurt Cobain: Montage of Heck', 'Cave of Forgotten Dreams',
+       'The King of Kong: A Fistful of Quarters', 'Bowling for Columbine',
+       'The Fog of War', 'Muscle Shoals', 'Circus of Books', 'Boys State',
+       'Homecoming: A Film by Beyoncé', 'The War Tapes',
+       'Searching for Sugar Man', "Jafar Panahi's Taxi", 'Disclosure',
+       'Knives Out', 'The Irishman', 'The Godfather', 'Moonlight',
+       'A Star Is Born', 'A Quiet Place', 'Roma',
+       'Portrait of a Lady on Fire', 'Selma', 'Spotlight',
+       'The Shape of Water', 'Arrival', 'The Favourite',
+       'Double Indemnity', 'Marriage Story', 'Boyhood',
+       '12 Years a Slave', 'Argo', 'Manchester by the Sea',
+       'Leave No Trace', 'Alien', 'Call Me by Your Name', '1917',
+       'Gravity', 'The Maltese Falcon', 'The Florida Project', 'Widows',
+       'The Godfather, Part II', 'Never Rarely Sometimes Always',
+       'Pain and Glory', 'Hell or High Water', 'Bicycle Thieves',
+       'Brooklyn', 'The Babadook', 'Creed', 'The Wrestler',
+       'Dolemite Is My Name', 'First Man', 'The Lighthouse', 'I, Tonya',
+       'Hidden Figures', 'Taxi Driver', 'The Social Network',
+       'The Hate U Give', 'L.A. Confidential', 'Phantom Thread', 'Us',
+       'Get Out', 'Hereditary', 'It Follows', 'The Silence of the Lambs',
+       'Halloween', "Pan's Labyrinth", 'Host', 'The Witch',
+       'The Cabin in the Woods', "Don't Look Now", 'It',
+       'Possessor: Uncut', 'Relic', 'The Birds', 'Young Frankenstein',
+       'Ready or Not', 'La llorona', 'Drag Me to Hell',
+       'A Girl Walks Home Alone at Night', 'House of Wax', 'The Fly',
+       'Dracula', 'Midsommar', 'Carrie', 'Spontaneous', 'The Evil Dead',
+       'Evil Dead 2', 'The Innocents', 'The Loved Ones', 'Dead of Night',
+       'Harpoon', 'The Love Witch', 'Room 237', 'Suspiria',
+       'Werckmeister Harmonies', 'Shaun of the Dead', 'Train to Busan',
+       'A Nightmare on Elm Street', 'The Host', 'Dawn of the Dead',
+       'It Comes at Night', 'Zombieland', 'In Fabric', 'Re-Animator',
+       "Don't Breathe", 'The Endless', 'What Ever Happened to Baby Jane?',
+       'The Mortuary Collection', 'Cam', 'The Phantom of the Opera',
+       'The Wolf Man', 'Upgrade', 'Eraserhead', 'We Are Still Here',
+       'The Dark and the Wicked', 'The Texas Chain Saw Massacre',
+       'The Witches', 'Arachnophobia', 'Horror of Dracula',
+       'Dr. Jekyll and Mr. Hyde', 'The Mummy', 'Let Me In',
+       'Island of Lost Souls', 'Frenzy', 'Color Out of Space',
+       'The Conjuring', 'Misery', 'The Wicker Man',
+       'Little Shop of Horrors', 'Cronos', 'Bone Tomahawk',
+       'The Return of the Living Dead', '28 Days Later', 'Hush',
+       'E.T. the Extra-Terrestrial', 'Babe', 'My Fair Lady', 'Hugo',
+       'Enchanted', 'The Straight Story',
+       'Harry Potter and the Prisoner of Azkaban', "Pete's Dragon",
+       'The Secret of Roan Inish', 'A Monster Calls', 'Spy Kids',
+       'Summer Hours', 'Harry Potter and the Goblet of Fire',
+       'The Kid Who Would Be King', 'How Green Was My Valley',
+       'That Thing You Do!', 'First Position',
+       'Willy Wonka and the Chocolate Factory', 'Lassie', 'Duma',
+       'Jason and the Argonauts', 'A Christmas Story', 'Hamilton',
+       "David Byrne's American Utopia", 'Once', 'Amadeus',
+       'We Are the Best!', 'Hairspray', 'West Side Story',
+       "What's Love Got to Do With It", 'Beware of Mr. Baker',
+       'Exit Through the Gift Shop', "Keep on Keepin' On", 'Marley',
+       'You, the Living', 'The Full Monty', '49 Up',
+       'Straight Outta Compton', 'Cabaret', 'The Beaches of Agnès',
+       'Johnny Guitar', '20,000 Days on Earth', 'Wordplay', 'Pina',
+       'Nashville', 'Festival Express', 'Born Into Brothels',
+       'Funny Girl', 'Crumb', 'Love & Mercy', 'The Wrecking Crew',
+       'Marina Abramovic: The Artist Is Present', 'Black Is King',
+       'Crazy Heart', 'Los Angeles Plays Itself', 'Lost in La Mancha',
+       'Lagaan: Once Upon a Time in India', 'My Kid Could Paint That',
+       'End of the Century', "Dave Chappelle's Block Party",
+       'The Sapphires', 'Florence Foster Jenkins', 'Sing Your Song',
+       'The Filth and the Fury', 'Hedwig and the Angry Inch', 'Judy',
+       'A Band Called Death', 'My Architect', 'Every Little Step',
+       'Black Orpheus', 'U2 3D', 'Five Easy Pieces', 'Sid & Nancy',
+       'La Bamba', 'Sweeney Todd: The Demon Barber of Fleet Street',
+       'Chicago', 'Scratch', 'In Search of Beethoven', 'High Noon',
+       'Nightcrawler', 'Strangers on a Train', 'The Post',
+       'The Night of the Hunter', 'His House', 'Eye in the Sky',
+       'The Killing', 'The Trial of the Chicago 7', 'Ex Machina',
+       'Searching', 'Sunrise', 'Blood Simple', 'Peeping Tom',
+       'The Vast of Night', '10 Cloverfield Lane', 'To Catch a Thief',
+       'Diabolique', 'Bridge of Spies', 'The Conversation', 'Gone Girl',
+       'Forbidden Planet', 'Jurassic Park', 'In the Line of Fire',
+       'Carol', 'Before Midnight', 'Her', 'Ash Is Purest White',
+       'The Hustler', 'Before Sunrise', 'Cold War', 'Slumdog Millionaire',
+       'Atlantics', 'Titanic', 'Say Anything...', 'The Lunchbox',
+       'Sense and Sensibility', 'The Half of It', 'From Here to Eternity',
+       'Foreign Correspondent', 'Four Weddings and a Funeral',
+       'Shakespeare in Love', 'Midnight in Paris', 'Manhattan', 'Gilda',
+       'Masculine-Feminine', 'Up in the Air', 'Gloria Bell', 'Dave',
+       'Eternal Sunshine of the Spotless Mind', 'The Town',
+       "A Summer's Tale", 'Moonstruck', 'Before Sunset', 'Big Night',
+       'Howards End', 'Shithouse', 'Giant', 'The Crying Game',
+       'Daughters of the Dust', 'The Quiet Man', 'About a Boy',
+       "To All the Boys I've Loved Before", 'Monsoon Wedding', 'Revanche',
+       'The Martian', 'Edge of Tomorrow', 'Snowpiercer', 'Blade Runner',
+       'The Hunger Games: Catching Fire', 'Love Is Strange',
+       'Last Year at Marienbad', 'Undefeated', 'The Overnighters',
+       'Call Me Kuchu', 'Holy Motors', 'Restrepo',
+       'Mea Maxima Culpa: Silence in the House of God',
+       'Let the Fire Burn', 'The Queen of Versailles',
+       'For the Bible Tells Me So', 'Blindsight', "Pandora's Box",
+       'The Imposter', 'Surfwise', 'No End in Sight',
+       'The Life and Times of Hank Greenberg',
+       'Burma VJ: Reporting From a Closed Country',
+       'An Inconvenient Truth', 'Finding Vivian Maier',
+       'Winged Migration', 'Sicko', 'Sweetgrass', 'A Film Unfinished',
+       'Bigger, Stronger, Faster', 'Trouble the Water', 'Food, Inc.',
+       'Chasing Ice', 'To Be and to Have', 'The Salt of the Earth',
+       'The Wild Parrots of Telegraph Hill', 'The Gatekeepers',
+       'Control Room', 'Bus 174', 'Touching the Void', 'My Winnipeg',
+       'Manakamana', 'I Am Divine', 'Cutie and the Boxer',
+       'Brooklyn Castle', 'Deep Water', 'The Last of the Unjust',
+       'The Devil Came on Horseback', 'Good Hair', 'Up the Yangtze',
+       '5 Broken Cameras', 'National Gallery',
+       'Plagues and Pleasures on the Salton Sea', 'Last Days in Vietnam',
+       'Super Size Me', 'The Arbor', 'Rocky', 'Battle of the Sexes',
+       'The Fighter', 'The Crash Reel', 'Sugar', 'Senna',
+       'The Damned United', 'Creed II', 'Boxing Gym', 'Red Army',
+       'Riding Giants', 'Dogtown and Z-Boys', 'The Color of Money',
+       'Up for Grabs', 'Hoosiers', 'Girlfight',
+       'Tristram Shandy: A Cock and Bull Story', 'Heaven Can Wait',
+       'Field of Dreams', 'The Heart of the Game', 'Tyson',
+       'The Hurricane', 'Chariots of Fire', 'Looking for Eric',
+       'The Armstrong Lie', 'Major League', 'Go Tigers!',
+       'You Cannot Kill David Arquette', 'Goon', 'Beyond the Mat',
+       'Invictus', 'The Boxer',
+       'Vision: From the Life of Hildegard von Bingen',
+       'A League of Their Own', 'Step Into Liquid',
+       'Once in a Lifetime: The Extraordinary Story of the New York Cosmos',
+       'Fed Up', 'Stoked: The Rise and Fall of Gator',
+       'Talladega Nights: The Ballad of Ricky Bobby', 'Invincible',
+       'Ultimate X: The Movie', "Gunnin' for That No. 1 Spot",
+       'The Blind Side', 'More Than a Game', 'Secretariat', 'The Sandlot',
+       'Dust to Glory', 'NASCAR', 'Glory Road', 'Because of Winn-Dixie',
+       'The Perfect Game', 'Steep', 'First Descent', 'Soul Surfer',
+       'The Replacements', 'Beerfest', 'Goal! The Dream Begins',
+       'Grudge Match', 'Jiminy Glick in Lalawood', 'Playing for Keeps',
+       'The Return', 'Behind the Candelabra',
+       'Not Quite Hollywood: The Wild, Untold Story of Ozploitation!',
+       "Being Elmo: A Puppeteer's Journey",
+       'El Camino: A Breaking Bad Movie', 'American Movie',
+       'Best Worst Movie', 'The Normal Heart', 'Side by Side',
+       'Joan Rivers: A Piece of Work', 'Yoo-Hoo, Mrs. Goldberg',
+       'The Kid Stays in the Picture', 'F for Fake',
+       'Electric Boogaloo: The Wild, Untold Story of Cannon Films',
+       'Duel', 'Saraband',
+       "Corman's World: Exploits of a Hollywood Rebel", 'Doctor Zhivago',
+       'The Five Obstructions', 'Tell Them Who You Are',
+       'This Film Is Not Yet Rated', 'Trekkies',
+       "Outfoxed: Rupert Murdoch's War on Journalism",
+       'Inside Deep Throat', 'Trumbo', 'Confirmation', 'Blank City',
+       'Tupac: Resurrection', 'Overnight', "Disney's Teacher's Pet",
+       'Pom Wonderful Presents: The Greatest Movie Ever Sold',
+       "Fellini: I'm a Born Liar", 'Only Human', 'My Date With Drew',
+       'Waking Sleeping Beauty', 'Porn Star: The Legend of Ron Jeremy',
+       'Cinema Verite', 'The Rugrats Movie', "I'm Still Here",
+       'Bamboozled', 'No Strings Attached', 'Phil Spector', 'I Am',
+       'The Real Cancun', '15 Minutes', 'Man of the Year',
+       'Pokémon 3: The Movie', 'The Honeymooners', 'From Justin to Kelly',
+       'The Good, the Bad and the Ugly', 'Unforgiven',
+       'Once Upon a Time in the West', 'Deadwood: The Movie',
+       'The Man Who Shot Liberty Valance', 'The Ballad of Buster Scruggs',
+       'Django Unchained', 'The Wild Bunch', '3:10 to Yuma', 'Lone Star',
+       'Butch Cassidy and the Sundance Kid', 'Blazing Saddles',
+       'The Magnificent Seven', 'The Outlaw Josey Wales', 'City Slickers',
+       'Westworld', 'McCabe & Mrs. Miller',
+       'The Three Burials of Melquiades Estrada', "Meek's Cutoff",
+       'Prospect', 'The Proposition', 'Dances With Wolves', 'Near Dark',
+       'The Hateful Eight', 'The Homesman', 'Open Range', 'Shanghai Noon',
+       'The Good, the Bad, the Weird', 'Appaloosa',
+       'The Assassination of Jesse James by the Coward Robert Ford',
+       'Red Hill', 'The Ballad of Little Jo', 'Hostiles',
+       'In a Valley of Violence', 'Tombstone', 'Blackthorn',
+       'The Horse Whisperer', 'The Keeping Room',
+       'Tears of the Black Tiger', 'The Salvation', 'Dead Man',
+       'The Rover', 'Maverick', 'The Claim', 'The Missing',
+       "Heaven's Gate", 'Legends of the Fall', 'The Quick and the Dead',
+       'The Killer Inside Me', 'Sukiyaki Western Django',
+       'Seraphim Falls', 'Ned Kelly', 'Down in the Valley',
+       'Cowboys & Aliens', 'The Pale Door', 'Three Amigos!', 'Brimstone',
+       'Jane Got a Gun', 'Forsaken', 'A Million Ways to Die in the West',
+       'The Lone Ranger', 'The Alamo', "The Warrior's Way",
+       'The Dark Tower', 'Wild Wild West', 'Priest', 'September Dawn',
+       'American Outlaws', 'Jonah Hex', 'Texas Rangers']
+/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+autocomplete(document.getElementById("myInput"), movies);
+</script>
+</body>
+
+</html>
